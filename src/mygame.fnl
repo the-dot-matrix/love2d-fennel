@@ -1,4 +1,4 @@
-(local Rectangle (require "fnl.rectangle"))
+(local Rectangle (require "src.rectangle"))
 (local rectangleA (Rectangle:new))
 (local rectangleB (Rectangle:new))
 (local rectangleC (Rectangle:new))
