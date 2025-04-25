@@ -1,22 +1,45 @@
 (local Rectangle {})
 (set Rectangle.__index Rectangle)
+(local Physics2D (require "src.__2Dphysics"))
+(local Space2D (require "src.__2Dspace"))
+
 (fn Rectangle.new [self]
+  (local f_random love.math.random)
   (local rectangle (setmetatable {} self))
-  (set rectangle.x (* (love.math.random) 200))
-  (set rectangle.speed 300)
-  (set rectangle.state true)
+  (let [initialX (+ (* (f_random) 200) 50)
+  initialY (+ (* (f_random) 200) 50)
+  initialDirection (* (f_random) (/ 2 math.pi))
+  initialSpeed 300]
+  (set rectangle.space (Space2D:new initialX initialY initialDirection initialSpeed)))
+  (set rectangle.inBounds true)
+  (set rectangle.behavior "bounce")
   rectangle)
 
+(fn Rectangle.behavior [self mode]
+  (set self.behavior mode))
+
+;; Keyboard inputs
+(fn Rectangle.keyboard [self mode]
+  (when (= mode "w")
+    self.y ))
+
 (fn Rectangle.update [self dt]
-  (if (or (> self.x 600) (< self.x 0))
-    (when (= true self.state)
-      (set self.speed (* -1 self.speed))
-      (set self.state false))
-    (when (= false self.state)
-      (set self.state true)))
-  (set self.x (+ self.x (* self.speed dt))))
+  ;;(when (= self.behavior "elastic")
+  ;;  (if (or (> self.x 600) (< self.x 0))
+  ;;    (when (= true self.inBounds)
+  ;;      (self:elasticCollision (/ pi 2))
+  ;;      (set self.inBounds false))
+  ;;    (when (= false self.inBounds)
+  ;;      (set self.inBounds true)))
+  ;;  (Physics2D.move self dt)))
+  ;;(when (= self.behavior "controlled")
+     ;;keyboard control
+    ;;)
+
+  )
 
 (fn Rectangle.draw [self]
-  (love.graphics.rectangle "line" self.x 50 200 150))
+  (let [space self.space]
+  (love.graphics.rectangle "line" space.x space.y 200 150)))
 
 Rectangle
