@@ -3,21 +3,15 @@
 
 (fn Rectangle.new [self]
   (local rectangle (setmetatable {} self))
-  (set rectangle.new nil)
-  rectangle
-  )
-
-(fn Rectangle.load [self] 
-  (set self.x (* (love.math.random) 200))
-  (set self.speed 100)
-  )
+  (set rectangle.x (* (love.math.random) 200))
+  (set rectangle.speed 100)
+  rectangle)
 
 (fn Rectangle.update [self dt]
-  (set self.x (+ self.x (* self.speed dt)))
-  )
+  (when (< self.x 600)
+    (set self.x (+ self.x (* self.speed dt)))))
 
 (fn Rectangle.draw [self]
-  (love.graphics.rectangle "line" self.x 50 200 150)
-  )
+  (love.graphics.rectangle "line" self.x 50 200 150))
 
 Rectangle
