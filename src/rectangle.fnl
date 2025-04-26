@@ -1,6 +1,7 @@
 (local Rectangle {})
 (set Rectangle.__index Rectangle)
 (local Space2D (require "src.Space2D"))
+(local Physics2D (require "src.Physics2D"))
 
 (fn Rectangle.new [self]
   (local rectangle (setmetatable {} self))
@@ -20,26 +21,27 @@
   rectangle)
 
 (fn Rectangle.update [self dt]
-  (local palkia self.space)
   ;; x bounds
-  (if (or (> palkia.x 600) (< palkia.x 0))
+  (if (or (> self.space.x 600) (< self.space.x 0))
     (when (= true self.xBounds)
-      (set palkia.polar (math.atan2 (palkia:uy) (- (palkia:ux))))
+      (set self.space.polar (math.atan2 (self.space:uy) (- (self.space:ux))))
       (set self.xBounds false)))
-  (if (and (<= palkia.x  400) (>= palkia.x 0))
+  (if (and (<= self.space.x  400) (>= self.space.x 0))
     (when (= false self.xBounds)
       (set self.xBounds true)))
-  (if (or (> palkia.y 400) (< palkia.y 0))
+  (if (or (> self.space.y 400) (< self.space.y 0))
     (when (= true self.yBounds)
-      (set palkia.polar (math.atan2 (- (palkia:uy))  (palkia:ux)))
+      (set self.space.polar (math.atan2 (- (self.space:uy))  (self.space:ux)))
       (set self.yBounds false)))
-  (if (and (<= palkia.y  450) (>= palkia.y 0))
+  (if (and (<= self.space.y  450) (>= self.space.y 0))
     (when (= false self.yBounds) 
       (set self.yBounds true)))
   ;; y bounds
   ;; movement
-  (set palkia.x (+ palkia.x (* (palkia:ux) palkia.speed dt)))
-  (set palkia.y (+ palkia.y (* (palkia:uy) palkia.speed dt))))
+  ; (set self.space.x (+ self.space.x (* (self.space:ux) self.space.speed dt)))
+  ; (set self.space.y (+ self.space.y (* (self.space:uy) self.space.speed dt)))
+  (Physics2D.move self dt)
+  )
   
 (fn Rectangle.draw [self]
   (love.graphics.rectangle "line" self.space.x self.space.y 200 150))
