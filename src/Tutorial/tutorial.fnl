@@ -1,18 +1,30 @@
-(var r1 nil)
-(var r2 nil)
+(var myImage nil)
+(var width nil)
+(var height nil)
 
 (fn love.load []
-  (local Rectangle (require "src.Tutorial.rectangle"))
-  (local Circle (require "src.Tutorial.circle"))
-  (set r1 (Rectangle:new 100 100 200 50))
-  (set r2 (Circle:new 350 80 40))
+ (set myImage (love.graphics.newImage "src/Tutorial/Pictures/Carmeline_Picrew.png"))
+ (set width (myImage:getWidth))
+ (set height (myImage:getHeight))
+ (love.graphics.setBackgroundColor 0.5 0.5 0.5)
 )
 
 (fn love.update [dt]
-  (r1:update dt)
-  (r2:update dt)
+  
   )
 
 (fn love.draw []
-  (r1:draw)
-  (r2:draw))
+  ;; love.graphics.draw Image x y xscale yscale xorigin yorigin x shear y shear
+  ;; same with love.graphics.print
+
+  ;; commenting line 21 makes all images yellow. implies that setColor is not for all subsequent
+  ;;operations but for subsequent operations w/ multiple calls. is universal? for single calls.
+  
+  (love.graphics.draw myImage 100 300 0 0.3 0.3 (/ width 2) (/ height 2))
+  
+  (love.graphics.setColor  1 0.8 0.2 0.5) 
+
+  (love.graphics.draw myImage 300 300 0 0.3 0.3 (/ width 2) (/ height 2))
+  
+  (love.graphics.setColor  1 1 1 1)
+  )

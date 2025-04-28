@@ -1,5 +1,6 @@
 ;;Shape
 ;;Super Object
+
 (fn update [self dt]
  (set self.x (+ self.x (* self.speed dt))))
 
