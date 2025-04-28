@@ -1,20 +1,16 @@
+(var tick nil)
+(var drawRectangle nil)
+(fn love.load []
+  (set tick (require "src.Tutorial.tick"))
+  (set drawRectangle false)
+  (tick.delay (fn [] (set drawRectangle true)) 2)
+  )
 
-(var test 10)
-(local hello (require "src.Tutorial.test"))
-(print test)
-(print (.. "from require " hello))
-
-(print (.."global " _G.test))
-
-; (fn love.load []
-  
-;   )
-
-; (fn love.update [dt]
-  
-; )
-
-; (fn love.draw []
-
-;   )
+(fn love.update [dt]
+  (tick.update dt)
+)
+(fn love.draw []
+  (if drawRectangle
+    (love.graphics.rectangle "fill" 100 100 300 200))
+  )
 
