@@ -1,13 +1,13 @@
-(local Shape (require "src.Tutorial.shape"))
-(local Circle (Shape.extend Shape))
+(local shape (require "src.Tutorial.shape"))
+(local Circle {})
 
 (fn Circle.new [self x y radius]
- (Circle.super.new self x y)
+ (shape self x y)
  (set self.radius radius)
+ self
  )
 
 (fn Circle.draw [self]
  (love.graphics.circle "line" self.x self.y self.radius))
-
 
 Circle
