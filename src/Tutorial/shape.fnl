@@ -1,6 +1,7 @@
-(global Shape (Object.extend Object)) ;; preferring explicit self passing
+(local Object (require "src.Tutorial.Packages.classic"))
+(local Shape (Object.extend Object))
 
-(fn Shape.new [self x y] 
+(fn Shape.new [self x y]
  (set self.x x)
  (set self.y y)
  (set self.speed 100))
