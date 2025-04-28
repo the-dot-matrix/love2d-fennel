@@ -1,23 +1,31 @@
+(var listOfRectangles [])
 
-(var x nil)
-(var y nil)
-(var speed nil)
-(var fruits [])
-
+(fn listOfRectangles.createRect []
+  (var rect {})
+  (set rect.x 100)
+  (set rect.y 100)
+  (set rect.width 70)
+  (set rect.height 90)
+  (set rect.speed 100)
+  (table.insert listOfRectangles rect)
+  )
+  
 (fn love.load []
-  (set fruits ["apple" "banana"])
-  (table.insert fruits "pear")
-  (table.insert fruits "pineapple")
-  (table.remove fruits 1)
-  (set (. fruits 1) "tomato")
+  
   )
 
 (fn love.update [dt]
+  (each [index value (ipairs listOfRectangles)]
+    (set value.x (+ value.x (* (. value "speed") dt))))
 )
 
 (fn love.draw []
-  (for [index 1 (length fruits)]
-  (love.graphics.print (.. "yummy " (. fruits index)) 100 (+ 75 (* 25 index)))))
-  (each [index value (ipairs fruits)]
-    (love.graphics.print (.. "yummy " value) 100 (+ 75 (* 25 index)))
+  (each [index value (ipairs listOfRectangles)]
+    (love.graphics.rectangle "line" (. value "x") (. value "y") (. value "width") (. value "height")))
+  
+  )
+
+(fn love.keypressed [key]
+  (when (= key "space") 
+    (listOfRectangles:createRect))
   )
