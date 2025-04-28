@@ -1,9 +1,11 @@
-(var x nil)
-(var y nil)
+(var Object nil)
 
 (fn love.load []
- (set x 30)
- (set y 50)
+ (set Object (require "src.Tutorial.classic"))
+ (require "src.Tutorial.rectangle")
+ (local r1 (Rectangle:new))
+ (local r2 (Rectangle:new))
+ (print r1.test r2.test)
   )
 
 (fn love.update [dt]
@@ -11,13 +13,7 @@
 )
 
 (fn love.draw []
-  (love.graphics.rectangle "line" x y 100 100)
+ 
   )
 
-(fn love.keypressed [key]
-  (when (= key "space")
-    (set x (math.random 100 500))
-    (set y (math.random 100 500)))
-  )
- 
 
