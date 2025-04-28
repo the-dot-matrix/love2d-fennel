@@ -9,19 +9,24 @@
 (global Object nil)
  ;; fails because of local scope?? even though instantiated outside of scope
 ;; of function where it is called
-
+(global Shape nil)
 (var Rectangle nil)
+(var Circle nil)
 (var r1 nil)
 (var r2 nil)
 (fn love.load []
   (set Object (require "src.Tutorial.Packages.classic"))
-  (set  Rectangle (require "src.Tutorial.rectangle" Object)) ;; tutorial does not set a rectangle class object
+  ;;Can use (require "src.Tutorial.rectangle") but must make rectangle in said module global, and 
+  ;;specify the calling of a global variable with _G.
+  (set Shape (require "src.Tutorial.shape"))
+  (set Rectangle (require "src.Tutorial.rectangle")) 
+  (set Circle (require "src.Tutorial.circle"));; tutorial does not set a rectangle class object
   ;; due to differences in fennel/lua scoping of modules. fennel requires passing of class object in module and 
   ;;storing of said object as a variable.
   (set r1 (Rectangle 100 100 200 50)) ;; Classic package for new, if no object is returned in fn new of object,
   ;;calling the name of the function works, likely due to functionality from the classic package.
   ;;however, explicitly calling a the new function of the object, fails bc of nil value.
-  (set r2 (Rectangle 350 80 25 140))
+  (set r2 (Circle 350 80 40))
   )
 
 (fn love.update [dt]
