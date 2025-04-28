@@ -1,16 +1,23 @@
-(var tick nil)
-(var drawRectangle nil)
+(var x nil)
+(var y nil)
+
 (fn love.load []
-  (set tick (require "src.Tutorial.tick"))
-  (set drawRectangle false)
-  (tick.delay (fn [] (set drawRectangle true)) 2)
+ (set x 30)
+ (set y 50)
   )
 
 (fn love.update [dt]
-  (tick.update dt)
+  
 )
+
 (fn love.draw []
-  (if drawRectangle
-    (love.graphics.rectangle "fill" 100 100 300 200))
+  (love.graphics.rectangle "line" x y 100 100)
   )
+
+(fn love.keypressed [key]
+  (when (= key "space")
+    (set x (math.random 100 500))
+    (set y (math.random 100 500)))
+  )
+ 
 
