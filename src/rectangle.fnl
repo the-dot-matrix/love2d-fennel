@@ -1,55 +1,51 @@
-(local Rectangle {})
-(set Rectangle.__index Rectangle)
-(local Space2D (require "src.Space2D"))
-(local Physics2D (require "src.Physics2D"))
+(local Rectangle {}) (set Rectangle.__index Rectangle)
+(local Vector (require :src.vector))
 
 (fn Rectangle.new [self]
-  (local rectangle (setmetatable {} self))
-  (let [xInit (+ (* (love.math.random) 200) 50)
-    yInit (+ (* (love.math.random) 200) 50)
-    speed (+ (* (love.math.random) 400) 100)
-    direction (* (love.math.random) 2 math.pi)
-    ]
-  (Space2D rectangle xInit yInit speed direction))
-  (Physics2D.classInheritor rectangle)
-  (set rectangle.mode "line")
-  (set rectangle.xBounds true)
-  (set rectangle.yBounds true)
-  (set rectangle.width 50)
-  (set rectangle.height 75)
-  (set rectangle.xCenter (fn [self] (+ self.x (/ self.width 2))))
-  (set rectangle.yCenter (fn [self] (+ self.y (/ self.height 2))))
-  (set rectangle.right (fn [self] (+ self.x self.width)))
-  (set rectangle.down (fn [self] (+ self.y self.height)))
-  (set rectangle.left (fn [self] self.x))
-  (set rectangle.up (fn [self] self.y))
+  (let [size      (Vector:new 50 75)
+        x         (+ (* (love.math.random) 200) 50)
+        y         (+ (* (love.math.random) 200) 50)
+        distance  (Vector:new x y)
+        speed     (+ (* (love.math.random) 400) 100)
+        direction (* (love.math.random) 2 math.pi)
+        velocity  (Vector:new speed direction true)
+        mode      :line
+        rectangle {: size : distance : velocity : mode }]
+    (setmetatable rectangle self)))
 
-  rectangle)
-
-(fn Rectangle.update [self dt]
-  (self.boundaryBounce self)
-  (self.move self dt))
+(fn Rectangle.update [self dt colliders]
+  (let [(w h) (love.graphics.getDimensions)
+        left  (< self.distance.x 0)
+        right (> (+ self.distance.x self.size.x) w)
+        above (< self.distance.y 0)
+        below (> (+ self.distance.y self.size.y) h)
+        flipx (* self.velocity (Vector:new -1 1))
+        flipy (* self.velocity (Vector:new 1 -1))]
+    (set self.distance (+ self.distance (* self.velocity dt)))
+    (when left (set self.distance.x 0))
+    (when right (set self.distance.x (- w self.size.x)))
+    (when above (set self.distance.y 0))
+    (when below (set self.distance.y (- h self.size.y)))
+    (when (or left right) (set self.velocity flipx))
+    (when (or above below) (set self.velocity flipy)))
+    (if (> (length colliders) 0) 
+        (set self.mode :fill)
+        (set self.mode :line)))
   
 (fn Rectangle.draw [self]
-  (love.graphics.rectangle self.mode self.x self.y self.width self.height))
+  (let [(x y) (values self.distance.x self.distance.y)
+        (w h) (values self.size.x self.size.y)]
+    (love.graphics.rectangle self.mode x y w h)))
 
-; (when (and self.collide object.collide) 
-;         (set self.polar (math.atan2 (- (self:uy)) (- (self:ux))))
-;         (set object.polar (math.atan2 (- (object:uy)) (- (object:ux))))
-;         (set self.collide false)
-;         (set object.collide false))
-;       (when false
-;         (set self.collide true)
-;         (set object.collide true))
-      
-
-(fn Rectangle.overlapDetector [self object]
-  (var result false)
-  (if (= true (and (> (self:right) (object:left)) (< (self:left) (object:right))
-      (> (self:down) (object:up)) (< (self:up) (object:down))))
-      (set result true))
-  result)
-
-
+(fn Rectangle.collide? [self other]
+  (let [left    #$1.distance.x
+        right   #(+ $1.distance.x $1.size.x)
+        top     #$1.distance.y
+        bottom  #(+ $1.distance.y $1.size.y)
+        overlapright  (> (right self)   (left other))
+        overlapleft   (< (left self)    (right other))
+        overlaptop    (< (top self)     (bottom other))
+        overlapbottom (> (bottom self)  (top other))]
+    (and overlapleft overlapright overlaptop overlapbottom)))
 
 Rectangle
