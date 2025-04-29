@@ -10,16 +10,17 @@
     speed (+ (* (love.math.random) 400) 100)
     direction (* (love.math.random) 2 math.pi)
     ]
-  (set rectangle.space (Space2D:new xInit yInit speed direction)))
+  (Space2D rectangle xInit yInit speed direction))
+  (Physics2D rectangle)
   (set rectangle.xBounds true)
   (set rectangle.yBounds true)
   rectangle)
 
 (fn Rectangle.update [self dt]
-  (Physics2D.boundaryBounce self)
-  (Physics2D.move self dt))
+  (self.boundaryBounce self)
+  (self.move self dt))
   
 (fn Rectangle.draw [self]
-  (love.graphics.rectangle "line" self.space.x self.space.y 200 150))
+  (love.graphics.rectangle "line" self.x self.y 200 150))
 
 Rectangle

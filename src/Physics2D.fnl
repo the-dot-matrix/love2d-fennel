@@ -1,39 +1,37 @@
-(local Physics2D {})
-(set Physics2D.__index Physics2D)
-;;(local Space2D (require "src.__2Dspace"))
 (local pi math.pi)
 
 ;; requires Super Object to have a space2d instance as an attribute
-(fn Physics2D.move [object dt]
-  (local palkia object.space)
-  (set palkia.x (+ palkia.x (* (palkia:ux) palkia.speed dt)))
-  (set palkia.y (+ palkia.y (* (palkia:uy) palkia.speed dt))))
+(fn move [object dt]
+  (set object.x (+ object.x (* (object:ux) object.speed dt)))
+  (set object.y (+ object.y (* (object:uy) object.speed dt))))
 
-(fn Physics2D.boundaryBounce [object]
+(fn boundaryBounce [object]
   ;; x bounds
-  (local palkia object.space)
-  (if (or (> palkia.x 600) (< palkia.x 0))
+  (if (or (> object.x 600) (< object.x 0))
     (when (= true object.xBounds)
-      (set palkia.polar (math.atan2 (palkia:uy) (- (palkia:ux))))
+      (set object.polar (math.atan2 (object:uy) (- (object:ux))))
       (set object.xBounds false)))
-  (if (and (<= palkia.x  400) (>= palkia.x 0))
+  (if (and (<= object.x  400) (>= object.x 0))
     (when (= false object.xBounds)
       (set object.xBounds true)))
   ;; y bounds
-  (if (or (> palkia.y 400) (< palkia.y 0))
+  (if (or (> object.y 400) (< object.y 0))
     (when (= true object.yBounds)
-      (set palkia.polar (math.atan2 (- (palkia:uy))  (palkia:ux)))
+      (set object.polar (math.atan2 (- (object:uy))  (object:ux)))
       (set object.yBounds false)))
-  (if (and (<= palkia.y  450) (>= palkia.y 0))
+  (if (and (<= object.y  450) (>= object.y 0))
     (when (= false object.yBounds) 
       (set object.yBounds true))))
 
 ;; work on complements 
 ;;;;;; WORK ON LATER
 ;; Boundary Object Class? based on length and position and orientation (equation based?) matrix
-(fn Physics2D.elasticCollision [object wall]
-  (local palkia object.space)
+(fn elasticCollision [object wall]
   ;; wall is a radian from 0 to pi
   )
 
-Physics2D
+(fn Inheritor [object]
+  (set object.move move)
+  (set object.boundaryBounce boundaryBounce))
+
+Inheritor
