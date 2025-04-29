@@ -12,6 +12,7 @@
     ]
   (Space2D rectangle xInit yInit speed direction))
   (Physics2D.classInheritor rectangle)
+  (set rectangle.mode "line")
   (set rectangle.xBounds true)
   (set rectangle.yBounds true)
   (set rectangle.width 50)
@@ -30,7 +31,7 @@
   (self.move self dt))
   
 (fn Rectangle.draw [self]
-  (love.graphics.rectangle "line" self.x self.y self.width self.height))
+  (love.graphics.rectangle self.mode self.x self.y self.width self.height))
 
 ; (when (and self.collide object.collide) 
 ;         (set self.polar (math.atan2 (- (self:uy)) (- (self:ux))))
