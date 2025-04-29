@@ -8,7 +8,9 @@
   (set rectangleSpawner (Spawner:new Rectangle)))
 
 (fn love.update [dt]
-  (rectangleSpawner:update dt))
+  (rectangleSpawner:collisionLogic)
+  (rectangleSpawner:update dt)
+  )
 
 (fn love.draw []
   (rectangleSpawner:draw)

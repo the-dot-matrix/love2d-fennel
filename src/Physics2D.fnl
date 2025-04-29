@@ -1,11 +1,14 @@
+(local physics2D {})
+(set physics2D.__index physics2D)
+
 (local pi math.pi)
 
 ;; requires Super Object to have a space2d instance as an attribute
-(fn move [object dt]
+(fn physics2D.move [object dt]
   (set object.x (+ object.x (* (object:ux) object.speed dt)))
   (set object.y (+ object.y (* (object:uy) object.speed dt))))
 
-(fn boundaryBounce [object]
+(fn physics2D.boundaryBounce [object]
   ;; x bounds
   (if (or (> object.x 600) (< object.x 0))
     (when (= true object.xBounds)
@@ -23,15 +26,19 @@
     (when (= false object.yBounds) 
       (set object.yBounds true))))
 
-;; work on complements 
-;;;;;; WORK ON LATER
-;; Boundary Object Class? based on length and position and orientation (equation based?) matrix
-(fn elasticCollision [object wall]
-  ;; wall is a radian from 0 to pi
-  )
+(fn physics2D.classInheritor [object]
+  (set object.move physics2D.move)
+  (set object.boundaryBounce physics2D.boundaryBounce))
 
-(fn Inheritor [object]
-  (set object.move move)
-  (set object.boundaryBounce boundaryBounce))
 
-Inheritor
+(fn physics2D.basicObjectCollision [object spawner overlap]
+  (local spawns spawner.spawns)
+  (local collisionMangement [])
+  (local overlapLength (length overlap))
+  (for [index 1 overlapLength]
+    (local spawn spawns.index)
+    (var directionVector spawn.polar)
+    (local overlapCenterVectors {}))
+    )
+
+physics2D
