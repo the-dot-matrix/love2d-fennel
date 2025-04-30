@@ -2,10 +2,13 @@
 
 (fn Vector.new [self a b polar?]
   (let [x (if polar? (* (math.cos b) a) a)
-        y (if polar? (* (math.sin b) a) b)]
+        y (if polar? (* (math.sin b) a) b)] ;;Interesting choice to force x y 
+        ;;representation internally
     (setmetatable {: x : y} self)))
 
 (fn Vector.mag [self] (math.sqrt (+ (^ self.x 2) (^ self.y 2))))
+
+(fn Vector.sum [self] (+ self.x self.y))
 
 (fn Vector.polar [self] (math.atan2 self.y self.x))
 

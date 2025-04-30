@@ -8,7 +8,7 @@
   (each [iself spawn (ipairs self.spawns)]
     (spawn:update dt (icollect [iother v (ipairs self.spawns)] 
       (if (and (not= iself iother) (spawn:collide? v)) 
-          v nil)))))
+          v)))))
 
 (fn Spawner.draw [self]
   (each [_ spawn (ipairs self.spawns)] (spawn:draw)))

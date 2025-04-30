@@ -8,7 +8,7 @@
         distance  (Vector:new x y)
         speed     (+ (* (love.math.random) 400) 100)
         direction (* (love.math.random) 2 math.pi)
-        velocity  (Vector:new speed direction true)
+        velocity  (Vector:new speed direction true) 
         mode      :line
         rectangle {: size : distance : velocity : mode }]
     (setmetatable rectangle self)))
@@ -28,18 +28,30 @@
     (when below (set self.distance.y (- h self.size.y)))
     (when (or left right) (set self.velocity flipx))
     (when (or above below) (set self.velocity flipy)))
-    (if (> (length colliders) 0)  (set self.mode :fill)
-                                  (set self.mode :line))
+    (if (> (length colliders) 0) (set self.mode :fill)
+                                 (set self.mode :line))
     (when (> (length colliders) 0)
-      (set self.velocity (Vector:new (self.velocity:mag)
-        (* (/ 1.0 (length colliders))
+    (local otherMeanPolar (* (/ 1.0 (length colliders))
           (accumulate [new 0 _ other (pairs colliders)]
             (let [center      #(+ $1.distance (/ $1.size 2))
-                  direction   (- (center self) (center other))
+                  direction   (- (center self) (center other)) ;; vector from other to self
                   unitvector  (/ direction (direction:mag))
                   pushangle   (unitvector:polar)]
-              (+ new pushangle))))
-        true))))
+              (+ new pushangle)))))
+    (local otherMeanUnitVector (Vector:new 1 otherMeanPolar true))
+    (local selfUnitVector (Vector:new 1 (self.velocity:polar) true))
+    (local dotVector (* selfUnitVector otherMeanUnitVector))
+    (local projectionVector (* (math.abs (dotVector:sum)) otherMeanUnitVector))
+    (local reflectionVector (+ selfUnitVector (* 2 projectionVector)))
+    (set self.velocity (Vector:new (self.velocity:mag) 
+                                   (reflectionVector:polar) true))))
+
+  ;;;; sufficient. it works. 
+  ;; previous implementation sets collided velocities to be average of all polar
+  ;; centers excluding original direction
+  ;; desired implementation seeked to emulate reflection by setting the 
+  ;; projection of the vector on the average polar to match polarity with 
+  ;; vector from other to self center.
   
 (fn Rectangle.draw [self]
   (let [(x y) (values self.distance.x self.distance.y)
