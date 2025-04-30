@@ -35,8 +35,8 @@
         (* (/ 1.0 (length colliders))
           (accumulate [new 0 _ other (pairs colliders)]
             (let [center      #(+ $1.distance (/ $1.size 2))
-                  direction   (- (center other) (center self))
-                  unitvector  (/ direction (direction:mag) -1)
+                  direction   (- (center self) (center other))
+                  unitvector  (/ direction (direction:mag))
                   pushangle   (unitvector:polar)]
               (+ new pushangle))))
         true))))
