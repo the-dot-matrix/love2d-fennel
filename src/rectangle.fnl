@@ -28,9 +28,17 @@
     (when below (set self.distance.y (- h self.size.y)))
     (when (or left right) (set self.velocity flipx))
     (when (or above below) (set self.velocity flipy)))
-    (if (> (length colliders) 0) 
-        (set self.mode :fill)
-        (set self.mode :line)))
+    (if (> (length colliders) 0)  (set self.mode :fill)
+                                  (set self.mode :line))
+    (when (> (length colliders) 0)
+      (set self.velocity (Vector:new (self.velocity:mag)
+        (accumulate [new 0 _ other (pairs colliders)]
+          (let [center      #(+ $1.distance (/ $1.size 2))
+                direction   (- (center other) (center self))
+                unitvector  (/ direction (direction:mag) -1)
+                pushangle   (unitvector:polar)]
+            (+ new pushangle)))
+        true))))
   
 (fn Rectangle.draw [self]
   (let [(x y) (values self.distance.x self.distance.y)
