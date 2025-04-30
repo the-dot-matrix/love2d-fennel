@@ -32,12 +32,13 @@
                                   (set self.mode :line))
     (when (> (length colliders) 0)
       (set self.velocity (Vector:new (self.velocity:mag)
-        (accumulate [new 0 _ other (pairs colliders)]
-          (let [center      #(+ $1.distance (/ $1.size 2))
-                direction   (- (center other) (center self))
-                unitvector  (/ direction (direction:mag) -1)
-                pushangle   (unitvector:polar)]
-            (+ new pushangle)))
+        (* (/ 1.0 (length colliders))
+          (accumulate [new 0 _ other (pairs colliders)]
+            (let [center      #(+ $1.distance (/ $1.size 2))
+                  direction   (- (center other) (center self))
+                  unitvector  (/ direction (direction:mag) -1)
+                  pushangle   (unitvector:polar)]
+              (+ new pushangle))))
         true))))
   
 (fn Rectangle.draw [self]
