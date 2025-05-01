@@ -38,13 +38,13 @@
                   unitvector  (/ direction (direction:mag))
                   pushangle   (unitvector:polar)]
               (+ new pushangle)))))
-    (local otherMeanUnitVector (Vector:new 1 otherMeanPolar true))
-    (local selfUnitVector (Vector:new 1 (self.velocity:polar) true))
-    (local dotVector (* selfUnitVector otherMeanUnitVector))
-    (local projectionVector (* (math.abs (dotVector:sum)) otherMeanUnitVector))
-    (local reflectionVector (+ selfUnitVector (* 2 projectionVector)))
-    (set self.velocity (Vector:new (self.velocity:mag) 
-                                   (reflectionVector:polar) true))))
+    (let [otherMeanUnitVector (Vector:new 1 otherMeanPolar true)
+          selfUnitVector (Vector:new 1 (self.velocity:polar) true)
+          dotVector (* selfUnitVector otherMeanUnitVector)
+          projectionVector (* (math.abs (dotVector:sum)) otherMeanUnitVector)
+          reflectionVector (+ selfUnitVector (* 2 projectionVector))]
+      (set self.velocity (Vector:new (self.velocity:mag) 
+                                   (reflectionVector:polar) true)))))
 
   ;;;; sufficient. it works. 
   ;; previous implementation sets collided velocities to be average of all polar
