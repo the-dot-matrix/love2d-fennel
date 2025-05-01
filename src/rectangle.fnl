@@ -1,72 +1,67 @@
 (local Rectangle {}) (set Rectangle.__index Rectangle)
 (local Vector (require :src.vector))
 
-(fn Rectangle.new [self]
-  (let [size      (Vector:new 50 75)
-        x         (+ (* (love.math.random) 200) 50)
-        y         (+ (* (love.math.random) 200) 50)
+(fn Rectangle.new [self x y w h s]
+  (let [size      (Vector:new (or w 50) (or h 75))
+        x         (or x (+ (* (love.math.random) 200) 50))
+        y         (or y (+ (* (love.math.random) 200) 50))
         distance  (Vector:new x y)
-        speed     (+ (* (love.math.random) 400) 100)
+        speed     (or s (+ (* (love.math.random) 400) 100))
         direction (* (love.math.random) 2 math.pi)
-        velocity  (Vector:new speed direction true) 
+        velocity  (Vector:new speed direction true)
         mode      :line
         rectangle {: size : distance : velocity : mode }]
     (setmetatable rectangle self)))
 
-(fn Rectangle.update [self dt colliders]
-  (let [(w h) (love.graphics.getDimensions)
-        left  (< self.distance.x 0)
-        right (> (+ self.distance.x self.size.x) w)
-        above (< self.distance.y 0)
-        below (> (+ self.distance.y self.size.y) h)
-        flipx (* self.velocity (Vector:new -1 1))
-        flipy (* self.velocity (Vector:new 1 -1))]
-    (set self.distance (+ self.distance (* self.velocity dt)))
-    (when left (set self.distance.x 0))
-    (when right (set self.distance.x (- w self.size.x)))
-    (when above (set self.distance.y 0))
-    (when below (set self.distance.y (- h self.size.y)))
-    (when (or left right) (set self.velocity flipx))
-    (when (or above below) (set self.velocity flipy)))
-    (if (> (length colliders) 0) (set self.mode :fill)
-                                 (set self.mode :line))
-    (when (> (length colliders) 0)
-    (local otherMeanPolar (* (/ 1.0 (length colliders))
-          (accumulate [new 0 _ other (pairs colliders)]
-            (let [center      #(+ $1.distance (/ $1.size 2))
-                  direction   (- (center self) (center other)) ;; vector from other to self
-                  unitvector  (/ direction (direction:mag))
-                  pushangle   (unitvector:polar)]
-              (+ new pushangle)))))
-    (let [otherMeanUnitVector (Vector:new 1 otherMeanPolar true)
-          selfUnitVector (Vector:new 1 (self.velocity:polar) true)
-          dotVector (* selfUnitVector otherMeanUnitVector)
-          projectionVector (* (math.abs (dotVector:sum)) otherMeanUnitVector)
-          reflectionVector (+ selfUnitVector (* 2 projectionVector))]
-      (set self.velocity (Vector:new (self.velocity:mag) 
-                                   (reflectionVector:polar) true)))))
+(fn Rectangle.update [self dt collides]
+  (set self.distance (+ self.distance (* self.velocity dt)))
+  (if (> (length collides) 0)  
+    (do (set self.velocity (self:bounces collides))
+        (set self.mode :fill))
+    (set self.mode :line)))
 
-  ;;;; sufficient. it works. 
-  ;; previous implementation sets collided velocities to be average of all polar
-  ;; centers excluding original direction
-  ;; desired implementation seeked to emulate reflection by setting the 
-  ;; projection of the vector on the average polar to match polarity with 
-  ;; vector from other to self center.
-  
-(fn Rectangle.draw [self]
+(fn Rectangle.draw [self collides]
   (let [(x y) (values self.distance.x self.distance.y)
         (w h) (values self.size.x self.size.y)]
     (love.graphics.rectangle self.mode x y w h)))
 
 (fn Rectangle.collide? [self other]
-  (let [left    #$1.distance.x
-        right   #(+ $1.distance.x $1.size.x)
-        top     #$1.distance.y
-        bottom  #(+ $1.distance.y $1.size.y)
-        overlapright  (> (right self)   (left other))
-        overlapleft   (< (left self)    (right other))
-        overlaptop    (< (top self)     (bottom other))
-        overlapbottom (> (bottom self)  (top other))]
-    (and overlapleft overlapright overlaptop overlapbottom)))
+  (let [left      #$1.distance.x
+        right     #(+ $1.distance.x $1.size.x)
+        top       #$1.distance.y
+        bottom    #(+ $1.distance.y $1.size.y)
+        maxleft   (math.max (left self) (left other))
+        minright  (math.min (right self) (right other))
+        maxtop    (math.max (top self) (top other))
+        minbottom (math.min (bottom self) (bottom other))
+        width     (- minright maxleft)
+        height    (- minbottom maxtop)
+        size      (Vector:new width height)
+        distance  (Vector:new maxleft maxtop)
+        collision {: size : distance}]
+    (when (and (> width 0) (> height 0)) collision)))
+
+(fn Rectangle.bounces [self collides]
+  (let [flipx   (Vector:new -1 1)
+        flipx   (flipx:polar)
+        flipy   (Vector:new 1 -1)
+        flipy   (flipy:polar)
+        cwidth  (. collides 1 :size :x)
+        cheight (. collides 1 :size :y)
+        (a f)   (case [(length collides) cwidth cheight]
+                  (where [1 w h] (> w h)) (values flipy 1)
+                  (where [1 w h] (< w h)) (values flipx 1)
+                  _ (values 0 0))
+        sum     (accumulate [new a _ c (ipairs collides)]
+                  (self:bounce c new))
+        avg     (/ sum (+ (length collides) f))]
+    (Vector:new (self.velocity:mag) avg true)))
+
+(fn Rectangle.bounce [self collide accum]
+  (let [center      #(+ $1.distance (/ $1.size 2))
+        direction   (- (center self) (center collide))
+        unitvector  (/ direction (direction:mag))
+        pushangle   (unitvector:polar)]
+    (+ accum pushangle)))
 
 Rectangle
