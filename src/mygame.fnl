@@ -4,14 +4,16 @@
 (var currentFrame 0)
 
 (fn love.load []
-  (set image (love.graphics.newImage :src/Tutorial/Pictures/jump.png))
+  (set image (love.graphics.newImage :src/Tutorial/Pictures/jump_2.png))
   (local frame_width 117)
   (local frame_height 233)
   (local width (image:getWidth))
   (local height (image:getHeight))
-  (for [i 0 4]
+  (for [index 0 4]
+    (local j (math.floor (/ index 3)))
+    (local i (% index 3))
     (table.insert frames
-      (love.graphics.newQuad (* i frame_width) 0 
+      (love.graphics.newQuad (* i frame_width) (* j frame_height) 
                               frame_width frame_height 
                               width height))))
 
