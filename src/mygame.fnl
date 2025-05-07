@@ -1,5 +1,4 @@
 ; practicing how to love
-(local Classic (require :src.Tutorial.Packages.classic))
 (local player (require :src.Tutorial.player))
 (local enemy (require :src.Tutorial.enemy))
 (local bullet (require :src.Tutorial.bullet))
@@ -12,24 +11,18 @@
 
 (fn love.update [dt]
   (player:update dt)
-  (enemy:update dt)
   (bullet:update dt)
+  (local collide? (bullet:collide? (enemy:hitbox)))
+  (enemy:update dt collide?)
   (when (bullet:miss?)
-    (love.load))
-  )
+    (love.load)))
 
 (fn love.draw []
   (player:draw)
   (enemy:draw)
   (bullet:draw)
-  (love.graphics.print (.. "fnl:\t" (love.timer.getFPS)))
-)
+  (love.graphics.print (.. "fnl:\t" (love.timer.getFPS))))
 
 (fn love.keypressed [key]
   (when (= key "space")
-    (let [coordinates (player:gun)
-      x (. coordinates :x)
-      y (. coordinates :y)]
-      (bullet:keyPressed x y))
-    )
-    )
+    (bullet:keyPressed (player:gun))))

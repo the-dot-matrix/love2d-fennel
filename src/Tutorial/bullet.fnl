@@ -1,3 +1,5 @@
+(local projectile (require :src.Tutorial.projectile))
+
 (local Bullet {})
 (set Bullet.__index Bullet)
 
@@ -5,43 +7,45 @@
  (local bullet (setmetatable {} self))
  (set self.spawns [])
  (set self.miss false)
-
- bullet
-)
+ bullet)
 
 (fn Bullet.update [self dt]
  (local window_height (love.graphics.getHeight))
  (each [_ v (ipairs self.spawns)]
   (when (> v.y window_height)
    (set self.miss true))
-  (set v.y (+ v.y (* v.speed dt)))
-  )
- ) 
-
-(fn Bullet.miss? [self]
- (local bulletMiss? self.miss)
- bulletMiss?
- )
+  (set v.y (+ v.y (* v.speed dt))))) 
 
 (fn Bullet.draw [self]
  (each [_ v (ipairs self.spawns)]
-  (love.graphics.draw v.image v.x v.y)
-  ))
+  (love.graphics.draw v.image v.x v.y)))
 
-(fn Bullet.spawn [self x y]
- (print "shoot")
- (local projectile {})
- (set projectile.__index projectile)
- 
- (set projectile.image (love.graphics.newImage :src/Tutorial/Pictures/bullet.png))
- (set projectile.x x)
- (set projectile.y y)
- (set projectile.speed 700)
- (set projectile.width (projectile.image:getWidth))
- (set projectile.height (projectile.image:getHeight))
- projectile)
+(fn Bullet.miss? [self]
+ (local bulletMiss? self.miss)
+ bulletMiss?)
 
-(fn Bullet.keyPressed [self x y]
- (table.insert self.spawns (Bullet:spawn x y)))
+(fn Bullet.keyPressed [self gun]
+ (let [
+  x (. gun :x)
+  y (. gun :y)]
+ (table.insert self.spawns (projectile:new x y))))
+
+(fn Bullet.collisionCheck? [projectileHitbox enemyHitbox]
+ (let [
+  collide? (and
+   (< (. projectileHitbox :left) (. enemyHitbox :right))
+   (> (. projectileHitbox :right) (. enemyHitbox :left))
+   (< (. projectileHitbox :top) (. enemyHitbox :bottom))
+   (> (. projectileHitbox :bottom) (. enemyHitbox :top)))
+  ]
+  collide?))
+
+(fn Bullet.collide? [self enemyHitbox]
+ (var collide? false)
+ (each [i v (ipairs self.spawns)]
+  (when (self.collisionCheck? (v:hitbox) enemyHitbox)
+   (table.remove self.spawns i)
+   (set collide? true)))
+ collide?)
 
 Bullet

@@ -8,8 +8,7 @@
   (set self.speed 400)
   (set self.width (self.image:getWidth ))
   (set self.height (self.image:getHeight))
- player
- )
+ player)
 
 (fn Player.gun [self]
   (local coordinates {:x (+ self.x (/ self.width 2)) :y (+ self.y self.height)})
@@ -25,9 +24,7 @@
   (if (< self.x 0)
     (set self.x 0)
    (> (+ self.x self.width) window_width)
-    (set self.x (- window_width self.width))
-   ))
- )
+    (set self.x (- window_width self.width)))))
 
 (fn Player.draw [self]
  (love.graphics.draw self.image self.x self.y))
