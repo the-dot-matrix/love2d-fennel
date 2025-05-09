@@ -54,11 +54,11 @@
 (fn love.keypressed [key]
   (fn isEmpty [x y]
     (= (. tilemap x y) 0))
-  (local input_decoder {
-    :right #(set $1.tile_x (if (isEmpty (+ $1.tile_x 1) $1.tile_y) (+ $1.tile_x 1) $1.tile_x))
-    :left  #(set $1.tile_x (if (isEmpty (- $1.tile_x 1) $1.tile_y) (- $1.tile_x 1) $1.tile_x))
-    :up    #(set $1.tile_y (if (isEmpty $1.tile_x (- $1.tile_y 1)) (- $1.tile_y 1) $1.tile_y))
-    :down  #(set $1.tile_y (if (isEmpty $1.tile_x (+ $1.tile_y 1)) (+ $1.tile_y 1) $1.tile_y))
-    })
-  ((. input_decoder key) player)
+  (var input_decoder nil)
+  (case key 
+    :right (set input_decoder #(set $1.tile_x (if (isEmpty (+ $1.tile_x 1) $1.tile_y) (+ $1.tile_x 1) $1.tile_x)))
+    :left  (set input_decoder #(set $1.tile_x (if (isEmpty (- $1.tile_x 1) $1.tile_y) (- $1.tile_x 1) $1.tile_x)))
+    :up    (set input_decoder #(set $1.tile_y (if (isEmpty $1.tile_x (- $1.tile_y 1)) (- $1.tile_y 1) $1.tile_y)))
+    :down  (set input_decoder #(set $1.tile_y (if (isEmpty $1.tile_x (+ $1.tile_y 1)) (+ $1.tile_y 1) $1.tile_y))))
+  (input_decoder player)
   )
