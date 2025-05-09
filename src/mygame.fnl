@@ -1,26 +1,62 @@
 ; practicing how to love
+(var tilemap [])
 (var image nil)
-(local frames [])
-(var currentFrame 0)
+(var player nil)
+(var width 0)
+(var height 0)
+(var image_width 0)
+(var image_height 0)
+(var quads [])
 
 (fn love.load []
-  (set image (love.graphics.newImage :src/Tutorial/Pictures/jump_3.png))
-  (local frame_width 117)
-  (local frame_height 233)
-  (local width (image:getWidth))
-  (local height (image:getHeight))
-  (for [index 0 4]
-    (local j (math.floor (/ index 3)))
+  (set image (love.graphics.newImage :src/Tutorial/Pictures/tileset.png))
+  (set (image_width image_height) (image:getDimensions))
+  (set width (- (/ image_width 3) 2))
+  (set height (- (/ image_height 2) 2))
+  (for [index 0 6]
     (local i (% index 3))
-    (table.insert frames
-      (love.graphics.newQuad (+ 1 (* i (+ 2 frame_width))) (+ 1 (* j (+ 2 frame_height))) 
-                              frame_width frame_height 
-                              width height))))
-
+    (local j (math.floor (/ index 3)))
+    (table.insert quads 
+      (love.graphics.newQuad
+        (+ 1 (* i (+ width 2)))
+        (+ 1 (* j (+ height 2)))
+        width height
+        image_width image_height))
+    )
+  (set tilemap [[1 6 6 2 1 6 6 2]
+                 [3 0 0 4 5 0 0 3]
+                 [3 0 0 0 0 0 0 3]
+                 [4 2 0 0 0 0 1 5]
+                 [1 5 0 0 0 0 4 2]
+                 [3 0 0 0 0 0 0 3]
+                 [3 0 0 1 2 0 0 3]
+                 [4 6 6 5 4 6 6 5]])
+  (set player {
+    :image (love.graphics.newImage :src/Tutorial/Pictures/player.png)
+    :tile_x 2
+    :tile_y 2
+    }))
+ 
 (fn love.update [dt]
-  (set currentFrame (% (+ currentFrame dt) 5))
+ 
   )
 
 (fn love.draw []
-  (love.graphics.draw image (. frames (math.floor (+ currentFrame 1))) 100 100)
+  (local r [1 1 1 0 0])
+  (local g [1 0 0 0 1])
+  (local b [1 0 1 1 1])
+  (each [i line (ipairs tilemap)]
+    (each [j tile (ipairs line)]
+        (if (not= tile 0)
+        (love.graphics.draw image (. quads tile) (* j width) (* i height)))))
+  (love.graphics.draw player.image (* player.tile_x width) (* player.tile_y height)))
+
+(fn love.keypressed [key]
+  (local input_decoder {
+    :right #(set $1.tile_x (+ $1.tile_x 1))
+    :left  #(set $1.tile_x (- $1.tile_x 1))
+    :up    #(set $1.tile_y (- $1.tile_y 1))
+    :down  #(set $1.tile_y (+ $1.tile_y 1))
+    })
+  ((. input_decoder key) player)
   )
