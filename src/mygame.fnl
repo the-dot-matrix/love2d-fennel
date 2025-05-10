@@ -54,6 +54,9 @@
     (set player.size (+ player.size 1)))))
 
 (fn love.draw []
+  (local (w h) (love.graphics.getDimensions))
+  (love.graphics.push) ;; stores current display state (default)
+  (love.graphics.translate (- (/ w 2) player.x) (- (/ h 2) player.y))
   (each [_ v (ipairs coin_pouch)]
     (love.graphics.draw v.image v.x v.y 0
       1 1 (/ (v.image:getWidth) 2) (/ (v.image:getHeight) 2))
@@ -61,6 +64,7 @@
   (love.graphics.circle :line player.x player.y player.size)
   (love.graphics.draw player.image player.x player.y 0
     1 1 (/ (player.image:getWidth) 2) (/ (player.image:getHeight) 2))
+  (love.graphics.pop) ;; pulls previous display state (default)
   (love.graphics.print (..
     "score:\t" player.score)))
 
@@ -78,4 +82,3 @@
   (when (= key :f2)
     (love.filesystem.remove :savedata.txt)
     (love.event.quit :restart)))
-
