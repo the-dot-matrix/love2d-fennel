@@ -3,6 +3,9 @@
 
 (var player {})
 (var coin_pouch [])
+(var screenShake 0)
+(var shakeWait 0)
+(var shakeOffset {:x 0 :y 0})
 (fn love.load []
   (let [x     100
         y     100
@@ -38,6 +41,14 @@
           (table.insert coin_pouch coin)))))))
  
 (fn love.update [dt]
+  (when (> screenShake 0)
+    (set screenShake (- screenShake dt))
+    (if (> shakeWait 0)
+      (set shakeWait (- shakeWait dt))
+      (do (set shakeOffset.x (love.math.random -5 5))
+            (set shakeOffset.y (love.math.random -5 5))
+            (set shakeWait 0.05))
+      ))
  (let [vx   (if (love.keyboard.isDown :left) -1 (love.keyboard.isDown :right) 1 0)
        vy   (if (love.keyboard.isDown :up) -1 (love.keyboard.isDown :down) 1 0)
        mag  (math.sqrt (+ (^ vx 2) (^ vy 2)))
@@ -51,19 +62,22 @@
   (when (collision? player v) 
     (table.remove coin_pouch i)
     (set player.score (+ player.score 1))
-    (set player.size (+ player.size 1)))))
+    (set player.size (+ player.size 1))
+    (set screenShake 0.2))))
 
 (fn love.draw []
   (local (w h) (love.graphics.getDimensions))
   (love.graphics.push) ;; stores current display state (default)
-  (love.graphics.translate (- (/ w 2) player.x) (- (/ h 2) player.y))
-  (each [_ v (ipairs coin_pouch)]
-    (love.graphics.draw v.image v.x v.y 0
-      1 1 (/ (v.image:getWidth) 2) (/ (v.image:getHeight) 2))
-    (love.graphics.circle :line v.x v.y v.size))
-  (love.graphics.circle :line player.x player.y player.size)
-  (love.graphics.draw player.image player.x player.y 0
-    1 1 (/ (player.image:getWidth) 2) (/ (player.image:getHeight) 2))
+    (when (> screenShake 0)
+      (love.graphics.translate shakeOffset.x shakeOffset.y))
+    (love.graphics.translate (- (/ w 2) player.x) (- (/ h 2) player.y))
+    (each [_ v (ipairs coin_pouch)]
+      (love.graphics.draw v.image v.x v.y 0
+        1 1 (/ (v.image:getWidth) 2) (/ (v.image:getHeight) 2))
+      (love.graphics.circle :line v.x v.y v.size))
+    (love.graphics.circle :line player.x player.y player.size)
+    (love.graphics.draw player.image player.x player.y 0
+      1 1 (/ (player.image:getWidth) 2) (/ (player.image:getHeight) 2))
   (love.graphics.pop) ;; pulls previous display state (default)
   (love.graphics.print (..
     "score:\t" player.score)))
